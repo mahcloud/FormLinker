@@ -14,6 +14,12 @@ const _isNil = (value) => {
   return(value === null || typeof(value) === "undefined");
 };
 
+const _isNumber = (value) => {
+  if(_isNil(value)) { return(false); }
+
+  return(typeof(value) === "number");
+};
+
 const _isObject = (value) => {
   if(_isNil(value)) { return(false); }
 
@@ -46,11 +52,19 @@ module.exports = class{
   }
 
   getFieldFormValue(attrName) {
-    return(this.formData[attrName] || "");
+    if(_isEmpty(this.formData[attrName]) && !_isNumber(this.formData[attrName])) {
+      return("");
+    } else {
+      return(this.formData[attrName]);
+    }
   }
 
   getFieldParsedValue(attrName) {
-    return(this.parsedData[attrName] || "");
+    if(_isEmpty(this.parsedData[attrName]) && !_isNumber(this.parsedData[attrName])) {
+      return("");
+    } else {
+      return(this.parsedData[attrName]);
+    }
   }
 
   handleFieldChange(attrName, results) {
@@ -63,6 +77,7 @@ module.exports = class{
       }
     } else {
       this.updateFormValue(attrName, results);
+      this.updateParsedValue(attrName, results);
     }
     this.fields[attrName].handleUpdate();
     if(typeof(this.changeCallback) === "function") {
