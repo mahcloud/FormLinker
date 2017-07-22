@@ -5,9 +5,13 @@ const _isArray = (value) => {
 };
 
 const _isEmpty = (value) => {
-  if(_isNil(value)) { return(false); }
+  if(_isNil(value)) { return(true); }
 
-  return((_isArray(value) && value.length === 0) || (_isObject(value) && Object.keys(value).length === 0));
+  return(
+    (isString(value) && value.length === 0)
+    || (isArray(value) && value.length === 0)
+    || (isObject(value) && Object.keys(value).length === 0)
+  );
 };
 
 const _isNil = (value) => {
@@ -24,6 +28,12 @@ const _isObject = (value) => {
   if(_isNil(value)) { return(false); }
 
   return(value.constructor === Object);
+};
+
+const _isString = (value) => {
+  if(this.isNil(value)) { return(false); }
+
+  return(typeof(value) === "string");
 };
 
 module.exports = class{
