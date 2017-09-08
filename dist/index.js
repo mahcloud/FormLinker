@@ -16,10 +16,10 @@ var _isArray = function _isArray(value) {
 
 var _isEmpty = function _isEmpty(value) {
   if (_isNil(value)) {
-    return false;
+    return true;
   }
 
-  return _isArray(value) && value.length === 0 || _isObject(value) && Object.keys(value).length === 0;
+  return _isString(value) && value.length === 0 || _isArray(value) && value.length === 0 || _isObject(value) && Object.keys(value).length === 0;
 };
 
 var _isNil = function _isNil(value) {
@@ -40,6 +40,14 @@ var _isObject = function _isObject(value) {
   }
 
   return value.constructor === Object;
+};
+
+var _isString = function _isString(value) {
+  if (_isNil(value)) {
+    return false;
+  }
+
+  return typeof value === "string";
 };
 
 module.exports = function () {
@@ -68,6 +76,7 @@ module.exports = function () {
     key: "focusOnField",
     value: function focusOnField(attrName) {
       this.fields[attrName].refs["input"].focus();
+      this.fields[attrName].refs["input"].setSelectionRange(9999, 9999);
     }
   }, {
     key: "getFieldErrors",
