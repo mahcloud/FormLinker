@@ -51,6 +51,7 @@ module.exports = class{
 
   focusOnField(attrName) {
     this.fields[attrName].refs["input"].focus();
+    this.fields[attrName].refs["input"].setSelectionRange(9999, 9999);
   }
 
   getFieldErrors(attrName) {
