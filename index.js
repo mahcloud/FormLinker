@@ -66,7 +66,7 @@ module.exports = class{
 
   handleFieldBlur(attrName, results) {
     this.updateFormValue(attrName, results.formatted);
-    this.updateParsedValue(attrName, results.parsed);
+    this.updateParsedValue(attrName, results.formatted);
     this.updateErrors(attrName, results.errors);
   }
 
