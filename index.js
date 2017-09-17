@@ -1,4 +1,8 @@
-import { isEqual, isEmpty, isNil, isNumber, isObject } from "lodash";
+const isEqual = require("lodash/isEqual");
+const isEmpty = require("lodash/isEmpty");
+const isNil = require("lodash/isNil");
+const isNumber = require("lodash/isNumber");
+const isObject = require("lodash/isObject");
 
 module.exports = class{
   constructor(options = {}) {

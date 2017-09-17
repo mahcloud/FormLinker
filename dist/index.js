@@ -2,11 +2,15 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _lodash = require("lodash");
-
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var isEqual = require("lodash/isEqual");
+var isEmpty = require("lodash/isEmpty");
+var isNil = require("lodash/isNil");
+var isNumber = require("lodash/isNumber");
+var isObject = require("lodash/isObject");
 
 module.exports = function () {
   function _class() {
@@ -44,7 +48,7 @@ module.exports = function () {
   }, {
     key: "getFieldFormValue",
     value: function getFieldFormValue(attrName) {
-      if ((0, _lodash.isEmpty)(this.formData[attrName]) && !(0, _lodash.isNumber)(this.formData[attrName])) {
+      if (isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
         return "";
       } else {
         return this.formData[attrName];
@@ -53,7 +57,7 @@ module.exports = function () {
   }, {
     key: "getFieldParsedValue",
     value: function getFieldParsedValue(attrName) {
-      if ((0, _lodash.isEmpty)(this.parsedData[attrName]) && !(0, _lodash.isNumber)(this.parsedData[attrName])) {
+      if (isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
         return "";
       } else {
         return this.parsedData[attrName];
@@ -62,7 +66,7 @@ module.exports = function () {
   }, {
     key: "handleFieldChange",
     value: function handleFieldChange(attrName, results) {
-      if ((0, _lodash.isObject)(results)) {
+      if (isObject(results)) {
         if (results.hasOwnProperty("formatted")) {
           this.updateFormValue(attrName, results.formatted);
         }
@@ -118,14 +122,14 @@ module.exports = function () {
       var differences = {};
       var data = this.getState("formData");
 
-      if ((0, _lodash.isNil)(fields)) {
+      if (isNil(fields)) {
         fields = Object.keys(this.fields);
       }
 
       fields.forEach(function (field) {
-        if (((0, _lodash.isNil)(original[field]) || original[field] === "") && ((0, _lodash.isNil)(data[field]) || data[field] === "")) {
+        if ((isNil(original[field]) || original[field] === "") && (isNil(data[field]) || data[field] === "")) {
           // do nothing
-        } else if (!(0, _lodash.isEqual)(original[field], data[field])) {
+        } else if (!isEqual(original[field], data[field])) {
           differences[field] = data[field];
         }
       });
@@ -135,9 +139,9 @@ module.exports = function () {
   }, {
     key: "getState",
     value: function getState(stateAttr) {
-      if ((0, _lodash.isNil)(this.form)) {
+      if (isNil(this.form)) {
         return {};
-      } else if ((0, _lodash.isNil)(this.form.state)) {
+      } else if (isNil(this.form.state)) {
         console.error("Form must have state to use the FormLinker");
         return {};
       } else {
@@ -173,7 +177,7 @@ module.exports = function () {
 
       Object.keys(this.fields).forEach(function (attrName) {
         var attrValue = data[attrName];
-        if (!(0, _lodash.isNil)(attrValue)) {
+        if (!isNil(attrValue)) {
           _this.handleFieldChange(attrName, { formatted: attrValue, parsed: attrValue });
         }
       });
@@ -181,7 +185,7 @@ module.exports = function () {
   }, {
     key: "setState",
     value: function setState(stateAttr, newState) {
-      if (!(0, _lodash.isNil)(this.form)) {
+      if (!isNil(this.form)) {
         this.form.setState(_defineProperty({}, stateAttr, newState));
       }
     }
@@ -192,7 +196,7 @@ module.exports = function () {
 
       Object.keys(this.fields).forEach(function (attrName) {
         var attrErrors = errors[attrName];
-        if (!(0, _lodash.isNil)(attrErrors)) {
+        if (!isNil(attrErrors)) {
           _this2.updateErrors(attrName, attrErrors);
         }
       });
@@ -219,7 +223,7 @@ module.exports = function () {
   }, {
     key: "updateErrors",
     value: function updateErrors(attr, newErrors) {
-      if ((0, _lodash.isEmpty)(newErrors)) {
+      if (isEmpty(newErrors)) {
         delete this.errorData[attr];
       } else {
         this.errorData[attr] = newErrors;
