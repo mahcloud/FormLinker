@@ -1,36 +1,4 @@
-const _isArray = (value) => {
-  if(_isNil(value)) { return(false); }
-
-  return(value.constructor === Array);
-};
-
-const _isEmpty = (value) => {
-  if(_isNil(value)) { return(true); }
-
-  return((_isString(value) && value.length === 0) || (_isArray(value) && value.length === 0) || (_isObject(value) && Object.keys(value).length === 0));
-};
-
-const _isNil = (value) => {
-  return(value === null || typeof(value) === "undefined");
-};
-
-const _isNumber = (value) => {
-  if(_isNil(value)) { return(false); }
-
-  return(typeof(value) === "number");
-};
-
-const _isObject = (value) => {
-  if(_isNil(value)) { return(false); }
-
-  return(value.constructor === Object);
-};
-
-const _isString = (value) => {
-  if(_isNil(value)) { return(false); }
-
-  return(typeof(value) === "string");
-};
+import { isEqual, isEmpty, isNil, isNumber, isObject } from "lodash";
 
 module.exports = class{
   constructor(options = {}) {
@@ -59,7 +27,7 @@ module.exports = class{
   }
 
   getFieldFormValue(attrName) {
-    if(_isEmpty(this.formData[attrName]) && !_isNumber(this.formData[attrName])) {
+    if(isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
       return("");
     } else {
       return(this.formData[attrName]);
@@ -67,7 +35,7 @@ module.exports = class{
   }
 
   getFieldParsedValue(attrName) {
-    if(_isEmpty(this.parsedData[attrName]) && !_isNumber(this.parsedData[attrName])) {
+    if(isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
       return("");
     } else {
       return(this.parsedData[attrName]);
@@ -75,7 +43,7 @@ module.exports = class{
   }
 
   handleFieldChange(attrName, results) {
-    if(_isObject(results)) {
+    if(isObject(results)) {
       if(results.hasOwnProperty("formatted")) {
         this.updateFormValue(attrName, results.formatted);
       }
@@ -120,10 +88,29 @@ module.exports = class{
   // FORM
   */
 
+  extractDifferences(original, fields) {
+    let differences = {};
+    const data = this.getState("formData");
+
+    if(isNil(fields)) {
+      fields = Object.keys(this.fields);
+    }
+
+    fields.forEach((field) => {
+      if((isNil(original[field]) || original[field] === "") && (isNil(data[field]) || data[field] === "")) {
+        // do nothing
+      } else if(!isEqual(original[field], data[field])) {
+        differences[field] = data[field];
+      }
+    });
+
+    return(differences);
+  }
+
   getState(stateAttr) {
-    if(_isNil(this.form)) {
+    if(isNil(this.form)) {
       return({});
-    } else if(_isNil(this.form.state)) {
+    } else if(isNil(this.form.state)) {
       console.error("Form must have state to use the FormLinker");
       return({});
     } else {
@@ -154,14 +141,14 @@ module.exports = class{
   setFormData(data) {
     Object.keys(this.fields).forEach((attrName) => {
       let attrValue = data[attrName];
-      if(!_isNil(attrValue)) {
+      if(!isNil(attrValue)) {
         this.handleFieldChange(attrName, {formatted: attrValue, parsed: attrValue});
       }
     });
   }
 
   setState(stateAttr, newState) {
-    if(!_isNil(this.form)) {
+    if(!isNil(this.form)) {
       this.form.setState({
         [stateAttr]: newState
       });
@@ -171,7 +158,7 @@ module.exports = class{
   setFormErrors(errors) {
     Object.keys(this.fields).forEach((attrName) => {
       let attrErrors = errors[attrName];
-      if(!_isNil(attrErrors)) {
+      if(!isNil(attrErrors)) {
         this.updateErrors(attrName, attrErrors);
       }
     });
@@ -194,7 +181,7 @@ module.exports = class{
   }
 
   updateErrors(attr, newErrors) {
-    if(_isEmpty(newErrors)) {
+    if(isEmpty(newErrors)) {
       delete this.errorData[attr];
     } else {
       this.errorData[attr] = newErrors;

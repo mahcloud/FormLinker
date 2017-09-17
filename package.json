@@ -14,7 +14,9 @@
     "build": "babel index.js --out-dir dist",
     "test": "ava"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "4.17.4"
+  },
   "devDependencies": {
     "ava": "0.18.2",
     "babel-cli": "^6.22.2",
