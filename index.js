@@ -1,3 +1,4 @@
+const isArray = require("lodash/isArray");
 const isEqual = require("lodash/isEqual");
 const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
@@ -31,7 +32,9 @@ module.exports = class{
   }
 
   getFieldFormValue(attrName) {
-    if(isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
+    if(isArray(this.parsedData[attrName])) {
+      return([]);
+    } else if(isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
       return("");
     } else {
       return(this.formData[attrName]);
@@ -39,7 +42,9 @@ module.exports = class{
   }
 
   getFieldParsedValue(attrName) {
-    if(isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
+    if(isArray(this.parsedData[attrName])) {
+      return([]);
+    } else if(isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
       return("");
     } else {
       return(this.parsedData[attrName]);

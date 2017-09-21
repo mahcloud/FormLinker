@@ -6,6 +6,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var isArray = require("lodash/isArray");
 var isEqual = require("lodash/isEqual");
 var isEmpty = require("lodash/isEmpty");
 var isNil = require("lodash/isNil");
@@ -48,7 +49,9 @@ module.exports = function () {
   }, {
     key: "getFieldFormValue",
     value: function getFieldFormValue(attrName) {
-      if (isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
+      if (isArray(this.parsedData[attrName])) {
+        return [];
+      } else if (isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
         return "";
       } else {
         return this.formData[attrName];
@@ -57,7 +60,9 @@ module.exports = function () {
   }, {
     key: "getFieldParsedValue",
     value: function getFieldParsedValue(attrName) {
-      if (isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
+      if (isArray(this.parsedData[attrName])) {
+        return [];
+      } else if (isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
         return "";
       } else {
         return this.parsedData[attrName];
