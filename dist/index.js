@@ -50,7 +50,7 @@ module.exports = function () {
     key: "getFieldFormValue",
     value: function getFieldFormValue(attrName) {
       if (isArray(this.parsedData[attrName])) {
-        return [];
+        return this.parsedData[attrName];
       } else if (isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
         return "";
       } else {
@@ -61,7 +61,7 @@ module.exports = function () {
     key: "getFieldParsedValue",
     value: function getFieldParsedValue(attrName) {
       if (isArray(this.parsedData[attrName])) {
-        return [];
+        return this.parsedData[attrName];
       } else if (isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
         return "";
       } else {

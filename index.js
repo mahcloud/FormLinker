@@ -33,7 +33,7 @@ module.exports = class{
 
   getFieldFormValue(attrName) {
     if(isArray(this.parsedData[attrName])) {
-      return([]);
+      return(this.parsedData[attrName]);
     } else if(isEmpty(this.formData[attrName]) && !isNumber(this.formData[attrName])) {
       return("");
     } else {
@@ -43,7 +43,7 @@ module.exports = class{
 
   getFieldParsedValue(attrName) {
     if(isArray(this.parsedData[attrName])) {
-      return([]);
+      return(this.parsedData[attrName]);
     } else if(isEmpty(this.parsedData[attrName]) && !isNumber(this.parsedData[attrName])) {
       return("");
     } else {
