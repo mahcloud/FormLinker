@@ -71,13 +71,10 @@ module.exports = function () {
   }, {
     key: "handleFieldChange",
     value: function handleFieldChange(attrName, results) {
-      if (isObject(results)) {
-        if (results.hasOwnProperty("formatted")) {
-          this.updateFormValue(attrName, results.formatted);
-        }
-        if (results.hasOwnProperty("parsed")) {
-          this.updateParsedValue(attrName, results.parsed);
-        }
+      if (isObject(results) && results.hasOwnProperty("formatted")) {
+        this.updateFormValue(attrName, results.formatted);
+      } else if (isObject(results) && results.hasOwnProperty("parsed")) {
+        this.updateParsedValue(attrName, results.parsed);
       } else {
         this.updateFormValue(attrName, results);
         this.updateParsedValue(attrName, results);
