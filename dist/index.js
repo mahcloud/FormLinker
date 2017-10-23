@@ -231,7 +231,9 @@ module.exports = function () {
         this.errorData[attr] = newErrors;
       }
       this.setState("errorData", this.errorData);
-      this.fields[attr].handleUpdate();
+      if (!isNil(this.fields[attr])) {
+        this.fields[attr].handleUpdate();
+      }
     }
   }]);
 
