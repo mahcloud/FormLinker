@@ -4,6 +4,7 @@ const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
 const isNumber = require("lodash/isNumber");
 const isObject = require("lodash/isObject");
+const set = require("lodash/set");
 
 module.exports = class{
   constructor(options = {}) {
@@ -23,8 +24,10 @@ module.exports = class{
   }
 
   focusOnField(attrName) {
-    this.fields[attrName].refs["input"].focus();
-    this.fields[attrName].refs["input"].setSelectionRange(9999, 9999);
+    if(!isNil(this.fields[attrName].refs["input"])) {
+      this.fields[attrName].refs["input"].focus();
+      this.fields[attrName].refs["input"].setSelectionRange(9999, 9999);
+    }
   }
 
   getFieldErrors(attrName) {
@@ -81,7 +84,7 @@ module.exports = class{
   }
 
   unregisterField(name, input) {
-    this.fields[name] = null;
+    delete this.fields[name];
   }
 
   updateAllFields() {
@@ -177,12 +180,12 @@ module.exports = class{
   }
 
   updateFormValue(attr, value) {
-    this.formData[attr] = value;
+    set(this.formData, attr, value);
     this.setState("formData", this.formData);
   }
 
   updateParsedValue(attr, value) {
-    this.parsedData[attr] = value;
+    set(this.parsedData, attr, value);
     this.setState("parsedData", this.parsedData);
   }
 

@@ -12,6 +12,7 @@ var isEmpty = require("lodash/isEmpty");
 var isNil = require("lodash/isNil");
 var isNumber = require("lodash/isNumber");
 var isObject = require("lodash/isObject");
+var set = require("lodash/set");
 
 module.exports = function () {
   function _class() {
@@ -38,8 +39,10 @@ module.exports = function () {
   }, {
     key: "focusOnField",
     value: function focusOnField(attrName) {
-      this.fields[attrName].refs["input"].focus();
-      this.fields[attrName].refs["input"].setSelectionRange(9999, 9999);
+      if (!isNil(this.fields[attrName].refs["input"])) {
+        this.fields[attrName].refs["input"].focus();
+        this.fields[attrName].refs["input"].setSelectionRange(9999, 9999);
+      }
     }
   }, {
     key: "getFieldErrors",
@@ -104,7 +107,7 @@ module.exports = function () {
   }, {
     key: "unregisterField",
     value: function unregisterField(name, input) {
-      this.fields[name] = null;
+      delete this.fields[name];
     }
   }, {
     key: "updateAllFields",
@@ -213,13 +216,13 @@ module.exports = function () {
   }, {
     key: "updateFormValue",
     value: function updateFormValue(attr, value) {
-      this.formData[attr] = value;
+      set(this.formData, attr, value);
       this.setState("formData", this.formData);
     }
   }, {
     key: "updateParsedValue",
     value: function updateParsedValue(attr, value) {
-      this.parsedData[attr] = value;
+      set(this.parsedData, attr, value);
       this.setState("parsedData", this.parsedData);
     }
   }, {
