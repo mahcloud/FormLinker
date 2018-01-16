@@ -99,7 +99,7 @@ module.exports = class{
 
   extractDifferences(original, fields) {
     let differences = {};
-    const data = this.getState("formData");
+    const data = this.formData;
 
     if(isNil(fields)) {
       fields = Object.keys(this.fields);
