@@ -125,7 +125,7 @@ module.exports = function () {
     key: "extractDifferences",
     value: function extractDifferences(original, fields) {
       var differences = {};
-      var data = this.getState("formData");
+      var data = this.formData;
 
       if (isNil(fields)) {
         fields = Object.keys(this.fields);
