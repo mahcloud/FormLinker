@@ -1,7 +1,7 @@
 module.exports = {
   "extends": "standard",
   "plugins": [
-    "standard"
+    "standard", "node", "import", "promise"
   ],
   "rules": {
     "space-before-function-paren": ["error", "never"],

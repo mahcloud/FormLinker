@@ -1,4 +1,4 @@
 {
-  "presets": [["env", {"modules": false}], "es2015"],
+  "presets": [["env", {"modules": false}]],
   "plugins": ["transform-es2015-modules-commonjs", "array-includes"]
 }
