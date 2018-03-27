@@ -192,7 +192,7 @@ test("extractDifferences multiple fields with many differences", t => {
   t.true(fl.isValid());
 })
 
-test("extractDifferences multiple fields with many differences", t => {
+test("extractDifferences multiple nested fields with many differences", t => {
   let fl = new FormLinker({
     data: {
       foo: 42,
