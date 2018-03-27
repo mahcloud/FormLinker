@@ -130,7 +130,7 @@ test("extractDifferences returns object with changes", t => {
       bar: 41
     }
   }
-  t.deepEqual(fl.extractDifferences(original, ["foo.bar"]), { 'foo.bar': 42 });
+  t.deepEqual(fl.extractDifferences(original, ["foo.bar"]), { "foo.bar": 42 });
   t.true(fl.isValid());
 })
 
