@@ -104,13 +104,12 @@ module.exports = class{
     }
 
     fields.forEach((field) => {
-      if((isNil(original[field]) || original[field] === "") && (isNil(data[field]) || data[field] === "")) {
+      if((isNil(get(original, field)) || get(original, field) === "") && (isNil(get(data, field)) || get(data, field) === "")) {
         // do nothing
-      } else if(!isEqual(original[field], data[field])) {
-        differences[field] = data[field];
+      } else if(!isEqual(get(original, field), get(data, field))) {
+        differences[field] = get(data, field);
       }
     });
-
     return(differences);
   }
 
