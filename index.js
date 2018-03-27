@@ -107,7 +107,7 @@ module.exports = class{
       if((isNil(get(original, field)) || get(original, field) === "") && (isNil(get(data, field)) || get(data, field) === "")) {
         // do nothing
       } else if(!isEqual(get(original, field), get(data, field))) {
-        differences[field] = get(data, field)
+        differences[field] = get(data, field);
       }
     });
     return(differences);
