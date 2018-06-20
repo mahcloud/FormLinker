@@ -1,15 +1,18 @@
-machine:
-  node:
-    version: 7.9.0
-
-dependencies:
-  override:
-    - npm install
-
-  cache_directories:
-    - node_modules/
-
-test:
-  override:
-    - npm test
-    - npm run lint
+version: 2
+jobs:
+  build:
+    working_directory: ~/linker
+    docker:
+      - image: circleci/node:7.9
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependencies-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run: npm test
+      - run: npm run lint
+      - run: npm run security
