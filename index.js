@@ -113,17 +113,6 @@ module.exports = class{
     return(differences);
   }
 
-  getState(stateAttr) {
-    if(isNil(this.form)) {
-      return({});
-    } else if(isNil(this.form.state)) {
-      console.error("Form must have state to use the FormLinker");
-      return({});
-    } else {
-      return(this.form.state[stateAttr]);
-    }
-  }
-
   isValid() {
     let valid = true;
     for(let key in this.fields) {
@@ -137,10 +126,6 @@ module.exports = class{
   registerForm(form) {
     this.form = form;
 
-    this.setState("formData", this.formData);
-    this.setState("parsedData", this.parsedData);
-    this.setState("errorData", this.errorData);
-
     this.updateAllFields();
   }
 
@@ -151,14 +136,6 @@ module.exports = class{
         this.handleFieldChange(attrName, {formatted: attrValue, parsed: attrValue});
       }
     });
-  }
-
-  setState(stateAttr, newState) {
-    if(!isNil(this.form)) {
-      this.form.setState({
-        [stateAttr]: newState
-      });
-    }
   }
 
   setFormErrors(errors) {
@@ -178,12 +155,10 @@ module.exports = class{
 
   updateFormValue(attr, value) {
     set(this.formData, attr, value);
-    this.setState("formData", this.formData);
   }
 
   updateParsedValue(attr, value) {
     set(this.parsedData, attr, value);
-    this.setState("parsedData", this.parsedData);
   }
 
   updateErrors(attr, newErrors) {
@@ -192,7 +167,6 @@ module.exports = class{
     } else {
       this.errorData[attr] = newErrors;
     }
-    this.setState("errorData", this.errorData);
     if(!isNil(this.fields[attr])) {
       this.fields[attr].handleUpdate();
     }
