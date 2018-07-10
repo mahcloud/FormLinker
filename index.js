@@ -11,8 +11,7 @@ const get = require("lodash/get");
 module.exports = class{
   constructor(options = {}) {
     this.fields = {};
-    this.formData = options.data || {};
-    this.parsedData = options.data || {};
+    this.data = options.data || {};
     this.errorData = {};
     this.changeCallback = options.onChange;
   }
@@ -37,15 +36,7 @@ module.exports = class{
   }
 
   getFieldFormValue(attrName) {
-    let data = get(this.formData, attrName);
-    if(isEmpty(data) && !isBoolean(data) && !isNumber(data) && !isArray(data)) {
-      return("");
-    }
-    return(data);
-  }
-
-  getFieldParsedValue(attrName) {
-    let data = get(this.parsedData, attrName);
+    let data = get(this.data, attrName);
     if(isEmpty(data) && !isBoolean(data) && !isNumber(data) && !isArray(data)) {
       return("");
     }
@@ -97,7 +88,7 @@ module.exports = class{
 
   extractDifferences(original, fields) {
     let differences = {};
-    const data = this.formData;
+    const data = this.data;
 
     if(isNil(fields)) {
       fields = Object.keys(this.fields);
@@ -154,11 +145,7 @@ module.exports = class{
   }
 
   updateFormValue(attr, value) {
-    set(this.formData, attr, value);
-  }
-
-  updateParsedValue(attr, value) {
-    set(this.parsedData, attr, value);
+    set(this.data, attr, value);
   }
 
   updateErrors(attr, newErrors) {
