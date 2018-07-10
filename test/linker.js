@@ -73,7 +73,7 @@ test("Deep Data", t => {
     }
   });
 
-  t.is(fl.getFieldParsedValue("foo.bar"), "Test");
+  t.is(fl.getFieldFormValue("foo.bar"), "Test");
   t.true(fl.isValid());
 });
 
@@ -86,7 +86,7 @@ test("Is a Boolean", t => {
     }
   });
 
-  t.is(fl.getFieldParsedValue("foo.bar"), true);
+  t.is(fl.getFieldFormValue("foo.bar"), true);
   t.true(fl.isValid());
 });
 
@@ -99,7 +99,7 @@ test("Is a empty Array", t => {
     }
   });
 
-  t.is(fl.getFieldParsedValue("foo.bar").length, 0);
+  t.is(fl.getFieldFormValue("foo.bar").length, 0);
   t.true(fl.isValid());
 });
 
@@ -112,7 +112,7 @@ test("Is a Boolean", t => {
     }
   });
 
-  t.is(fl.getFieldParsedValue("foo.bar"), 42);
+  t.is(fl.getFieldFormValue("foo.bar"), 42);
   t.true(fl.isValid());
 });
 
