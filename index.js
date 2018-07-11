@@ -9,6 +9,7 @@ const get = require("lodash/get");
 
 module.exports = class{
   constructor(options = {}) {
+    this.schema = options.schema || {};
     this.data = options.data || {};
     this.errors = {};
     this.changeCallback = options.onChange || function() {};
@@ -24,13 +25,7 @@ module.exports = class{
 
   setErrors(errors, fieldName) {
     if(isNil(fieldName)) {
-      this.data = {...this.errors, ...errors};
-      /* Object.keys(errors).forEach((fieldName) => {
-        let fieldErrors = errors[fieldName];
-        if(!isNil(fieldErrors)) {
-          this.setErrors(fieldErrors, fieldName);
-        }
-      }); */
+      this.errors = errors;
     } else {
       if(isEmpty(errors)) {
         delete this.errors[fieldName];
@@ -55,17 +50,31 @@ module.exports = class{
 
   setValue(value, fieldName) {
     if(isNil(fieldName)) {
-      set(this.data, fieldName, value);
-    } else {
+      // TODO: mask
       this.data = {...this.data, ...value};
-      /* Object.keys(value).forEach((fieldName) => {
-        let fieldValue = value[fieldName];
-        if(!isNil(fieldValue)) {
-          this.setValue(fieldValue, fieldName);
-        }
-      }); */
+    } else {
+      // TODO: mask
+      set(this.data, fieldName, value);
     }
     this.changeCallback();
+  }
+
+  /*
+   * Validation
+  */
+
+  isValid() {
+    return(this.schema.isValidSync(this.data));
+  }
+
+  validate(fieldName) {
+    // TODO: format or cast
+    // TODO: assign error on failure
+    /* this.schema.validate(value, { context: });
+    this.schema.validate(this.data).catch((err) => {
+      console.log(err.name, err.errors);
+    }); */
+    // const rule = yup.reach(this.schema, fieldName);
   }
 
   /*

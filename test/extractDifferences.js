@@ -1,5 +1,6 @@
 import test from "ava";
 import FormLinker from "../index";
+const yup = require("yup");
 
 test("extractDifferences returns object with changes", t => {
   let fl = new FormLinker({
@@ -7,7 +8,12 @@ test("extractDifferences returns object with changes", t => {
       foo: {
         bar: 42
       }
-    }
+    },
+    schema: yup.object().shape({
+      foo: yup.object().shape({
+        bar: yup.number().required().positive().integer()
+      })
+    })
   });
 
   let original = {
@@ -16,7 +22,7 @@ test("extractDifferences returns object with changes", t => {
     }
   }
   t.deepEqual(fl.extractDifferences(original, ["foo.bar"]), { "foo.bar": 42 });
-  // t.true(fl.isValid());
+  t.true(fl.isValid());
 });
 
 test("extractDifferences returns empty Object", t => {
@@ -25,7 +31,12 @@ test("extractDifferences returns empty Object", t => {
       foo: {
         bar: 42
       }
-    }
+    },
+    schema: yup.object().shape({
+      foo: yup.object().shape({
+        bar: yup.number().required().positive().integer()
+      })
+    })
   });
 
   let original = {
@@ -34,7 +45,7 @@ test("extractDifferences returns empty Object", t => {
     }
   }
   t.deepEqual(fl.extractDifferences(original, ["foo.bar"]), {});
-  // t.true(fl.isValid());
+  t.true(fl.isValid());
 });
 
 test("extractDifferences multiple fields with 1 different", t => {
@@ -42,7 +53,11 @@ test("extractDifferences multiple fields with 1 different", t => {
     data: {
       foo: 42,
       bar: 15
-    }
+    },
+    schema: yup.object().shape({
+      foo: yup.number().required().positive().integer(),
+      bar: yup.number().required().positive().integer()
+    })
   });
 
   let original = {
@@ -50,7 +65,7 @@ test("extractDifferences multiple fields with 1 different", t => {
     bar: 15
   }
   t.deepEqual(fl.extractDifferences(original, ["foo", "bar"]), { foo: 42 });
-  // t.true(fl.isValid());
+  t.true(fl.isValid());
 });
 
 test("extractDifferences multiple fields with many differences", t => {
@@ -62,7 +77,15 @@ test("extractDifferences multiple fields with many differences", t => {
       dog: true,
       happy: true,
       sad: false
-    }
+    },
+    schema: yup.object().shape({
+      foo: yup.number().required().positive().integer(),
+      bar: yup.number().required().positive().integer(),
+      cat: yup.boolean(),
+      dog: yup.boolean(),
+      happy: yup.boolean(),
+      sad: yup.boolean()
+    })
   });
 
   let original = {
@@ -74,7 +97,7 @@ test("extractDifferences multiple fields with many differences", t => {
     sad: true
   }
   t.deepEqual(fl.extractDifferences(original, ["foo", "bar", "cat", "dog", "happy", "sad"]), { foo: 42, cat: false, dog: true, happy: true, sad: false});
-  // t.true(fl.isValid());
+  t.true(fl.isValid());
 });
 
 test("extractDifferences multiple nested fields with many differences", t => {
@@ -90,7 +113,19 @@ test("extractDifferences multiple nested fields with many differences", t => {
         happy: true,
         sad: false
       }
-    }
+    },
+    schema: yup.object().shape({
+      foo: yup.number().required().positive().integer(),
+      bar: yup.number().required().positive().integer(),
+      girl: yup.object().shape({
+        happy: yup.boolean(),
+        sad: yup.boolean()
+      }),
+      boy: yup.object().shape({
+        happy: yup.boolean(),
+        sad: yup.boolean()
+      })
+    })
   });
 
   let original = {
@@ -106,5 +141,5 @@ test("extractDifferences multiple nested fields with many differences", t => {
     }
   }
   t.deepEqual(fl.extractDifferences(original, ["foo", "bar", "girl.happy", "girl.sad", "boy.happy", "boy.sad"]), {"foo": 42, "girl.happy": true, "girl.sad": false, "boy.happy": true, "boy.sad": false});
-  // t.true(fl.isValid());
+  t.true(fl.isValid());
 });

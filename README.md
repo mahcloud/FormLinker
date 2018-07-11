@@ -69,6 +69,8 @@ setErrors(errors // Object)
 
 Sets errors for all keys in object. Uses key/attr as fieldName and value as error array.
 
+When setting an object of errors, we assume that the developer wants to clear out all previous errors and start with a new error set as defined. So when calling this function, all previous errors are removed.
+
 
 getValue(fieldName // String)
 
