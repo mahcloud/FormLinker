@@ -1,5 +1,5 @@
 import test from "ava";
-import FormLinker from "../index";
+import FormLinker from "../src/index";
 const yup = require("yup");
 
 test("extractDifferences returns object with changes", t => {
