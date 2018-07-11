@@ -1,4 +1,4 @@
-import FormLinker from "../src";
+import FormLinker from "../";
 import test from "ava";
 
 test("schema string format", t => {
