@@ -1,8 +1,18 @@
+import FormLinker from "../src/";
 import test from "ava";
-import Schema from "../src/schema";
+
+test("schema simple fields", t => {
+  let fl = new FormLinker({
+    schema: {
+      foo: "string.required"
+    }
+  });
+
+  t.deepEqual(["foo"], fl.fields);
+});
 
 test("schema fields", t => {
-  let schema = new Schema({
+  let fl = new FormLinker({
     schema: {
       foo: "number",
       bar: "number",
@@ -21,5 +31,5 @@ test("schema fields", t => {
     }
   });
 
-  t.deepEqual(["foo", "bar", "girl.happy", "girl.sad", "girl.personality.mood", "girl.personality.quality", "boy.happy", "boy.sad"], schema.fields());
+  t.deepEqual(["foo", "bar", "girl.happy", "girl.sad", "girl.personality.mood", "girl.personality.quality", "boy.happy", "boy.sad"], fl.fields);
 });

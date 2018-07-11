@@ -1,15 +1,14 @@
 import test from "ava";
 import FormLinker from "../src/index";
-const yup = require("yup");
 
 test("set value", t => {
   let fl = new FormLinker({
     data: {
       foo: "bar"
     },
-    schema: yup.object().shape({
-      foo: yup.string()
-    })
+    schema: {
+      foo: "string"
+    }
   });
 
   t.deepEqual(fl.getValue("foo"), "bar");
@@ -25,11 +24,11 @@ test("set nested value", t => {
         bar: "cake"
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.string()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "string"
+      }
+    }
   });
 
   t.deepEqual(fl.getValue("foo.bar"), "cake");
@@ -45,17 +44,17 @@ test("set nested value to null", t => {
         bar: "cake"
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.string()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "string.required"
+      }
+    }
   });
 
   t.deepEqual(fl.getValue("foo.bar"), "cake");
   fl.setValue("foo.bar", null);
   t.deepEqual(fl.getValue("foo.bar"), "");
-  t.is(fl.isValid(), false);
+  t.true(fl.isValid());
 });
 
 test("set nested value to null", t => {
@@ -72,18 +71,18 @@ test("set nested value to null", t => {
         sad: true
       }
     },
-    schema: yup.object().shape({
-      foo: yup.number().required().positive().integer(),
-      bar: yup.number().required().positive().integer(),
-      girl: yup.object().shape({
-        happy: yup.boolean(),
-        sad: yup.boolean()
-      }),
-      boy: yup.object().shape({
-        happy: yup.boolean(),
-        sad: yup.boolean()
-      })
-    })
+    schema: {
+      foo: "number",
+      bar: "number",
+      girl: {
+        happy: "boolean",
+        sad: "boolean"
+      },
+      boy: {
+        happy: "boolean",
+        sad: "boolean"
+      }
+    }
   });
 
   t.deepEqual(fl.getValue("foo"), 42);

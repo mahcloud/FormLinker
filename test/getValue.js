@@ -1,15 +1,16 @@
 import test from "ava";
 import FormLinker from "../src/index";
-const yup = require("yup");
 
 test("get value", t => {
   let fl = new FormLinker({
     data: {
       foo: "bar"
     },
-    schema: yup.object().shape({
-      foo: yup.string()
-    })
+    schema: {
+      schema: {
+        foo: "string"
+      }
+    }
   });
 
   t.deepEqual(fl.getValue("foo"), "bar");
@@ -23,11 +24,11 @@ test("Deep Data", t => {
         bar: "Test"
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.string()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "string"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar"), "Test");
@@ -41,11 +42,11 @@ test("Is a Boolean", t => {
         bar: true
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.boolean()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "boolean"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar"), true);
@@ -59,11 +60,11 @@ test("Is a empty Array", t => {
         bar: []
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.array()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "array"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar").length, 0);
@@ -77,11 +78,11 @@ test("Is a Number", t => {
         bar: 42
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.number().positive().integer()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "number"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar"), 42);
@@ -95,11 +96,11 @@ test("Deep Data", t => {
         bar: "Test"
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.string()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "string"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar"), "Test");
@@ -113,11 +114,11 @@ test("Deep data boolean", t => {
         bar: true
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.boolean()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "boolean"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar"), true);
@@ -131,11 +132,11 @@ test("Deep data empty Array", t => {
         bar: []
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.array()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "array"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar").length, 0);
@@ -149,11 +150,11 @@ test("Deep data number", t => {
         bar: 42
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.number().positive().integer()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "number"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar"), 42);
@@ -167,13 +168,13 @@ test("Invalid deep data number", t => {
         bar: null
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.number()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "number.required"
+      }
+    }
   });
 
   t.is(fl.getValue("foo.bar"), "");
-  t.is(fl.isValid(), false);
+  t.true(fl.isValid());
 });

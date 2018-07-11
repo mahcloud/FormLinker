@@ -1,6 +1,5 @@
 import test from "ava";
 import FormLinker from "../src/index";
-const yup = require("yup");
 
 test("extractDifferences returns object with changes", t => {
   let fl = new FormLinker({
@@ -9,11 +8,11 @@ test("extractDifferences returns object with changes", t => {
         bar: 42
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.number().required().positive().integer()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "number"
+      }
+    }
   });
 
   let original = {
@@ -32,11 +31,11 @@ test("extractDifferences returns empty Object", t => {
         bar: 42
       }
     },
-    schema: yup.object().shape({
-      foo: yup.object().shape({
-        bar: yup.number().required().positive().integer()
-      })
-    })
+    schema: {
+      foo: {
+        bar: "number"
+      }
+    }
   });
 
   let original = {
@@ -54,10 +53,10 @@ test("extractDifferences multiple fields with 1 different", t => {
       foo: 42,
       bar: 15
     },
-    schema: yup.object().shape({
-      foo: yup.number().required().positive().integer(),
-      bar: yup.number().required().positive().integer()
-    })
+    schema: {
+      foo: "number",
+      bar: "number"
+    }
   });
 
   let original = {
@@ -78,14 +77,14 @@ test("extractDifferences multiple fields with many differences", t => {
       happy: true,
       sad: false
     },
-    schema: yup.object().shape({
-      foo: yup.number().required().positive().integer(),
-      bar: yup.number().required().positive().integer(),
-      cat: yup.boolean(),
-      dog: yup.boolean(),
-      happy: yup.boolean(),
-      sad: yup.boolean()
-    })
+    schema: {
+      foo: "number",
+      bar: "number",
+      cat: "boolean",
+      dog: "boolean",
+      happy: "boolean",
+      sad: "boolean"
+    }
   });
 
   let original = {
@@ -114,18 +113,18 @@ test("extractDifferences multiple nested fields with many differences", t => {
         sad: false
       }
     },
-    schema: yup.object().shape({
-      foo: yup.number().required().positive().integer(),
-      bar: yup.number().required().positive().integer(),
-      girl: yup.object().shape({
-        happy: yup.boolean(),
-        sad: yup.boolean()
-      }),
-      boy: yup.object().shape({
-        happy: yup.boolean(),
-        sad: yup.boolean()
-      })
-    })
+    schema: {
+      foo: "number",
+      bar: "number",
+      girl: {
+        happy: "boolean",
+        sad: "boolean"
+      },
+      boy: {
+        happy: "boolean",
+        sad: "boolean"
+      }
+    }
   });
 
   let original = {

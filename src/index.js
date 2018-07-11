@@ -1,4 +1,3 @@
-import Schema from "./schema";
 const get = require("lodash/get");
 const isArray = require("lodash/isArray");
 const isBoolean = require("lodash/isBoolean");
@@ -10,10 +9,24 @@ const set = require("lodash/set");
 
 module.exports = class{
   constructor(options = {}) {
-    this.schema = options.schema || new Schema();
+    this.schema = options.schema || {};
+    this.fields = this.calcFields();
+    this.formatters = options.formatters || {};
+    this.masks = options.masks || {};
     this.data = options.data || {};
     this.errors = {};
     this.changeCallback = options.onChange || function() {};
+  }
+
+  calcFields(schema = this.schema, prefix = "", fields = []) {
+    Object.keys(schema).forEach((key) => {
+      if(typeof schema[key] === "object") {
+        fields.concat(this.calcFields(schema[key], prefix + key + ".",  fields));
+      } else {
+	fields.push(prefix + key);
+      }
+    });
+    return(fields);
   }
 
   /*
@@ -59,8 +72,7 @@ module.exports = class{
   }
 
   setValue(fieldName, value) {
-    // TODO: mask
-    set(this.data, fieldName, value);
+    set(this.data, fieldName, this.mask(fieldName, value));
     this.changeCallback();
   }
 
@@ -71,11 +83,57 @@ module.exports = class{
   }
 
   /*
-   * Validation
+   * FORMATTING
+  */
+
+  format(fieldName, value) {
+    // TODO calculate options
+    const key = get(this.schema, fieldName);
+    if(isNil(this.formatters[key])) {
+      return({
+        errors: [],
+        formatted: value,
+        parsed: value,
+        valid: true
+      });
+    } else {
+      return(this.formatters[key].format(value, {}));
+    }
+  }
+
+  formatAll(values) {
+    // TODO format all
+    return(values);
+  }
+
+  /*
+   * MASKING
+  */
+
+  mask(fieldName, value) {
+    // TODO calculate options
+    const key = get(this.schema, fieldName);
+    if(isNil(this.formatters[key])) {
+      return(value);
+    } else {
+      return(this.masks[key].mask(value, {}));
+    }
+  }
+
+  /*
+   * VALIDATION
   */
 
   isValid() {
-    return(this.schema.isValidSync(this.data));
+    let flag = true;
+    for(let i = 0; i < this.fields.length; i++) {
+      const{valid} = this.format(this.fields[i], this.getValue(this.fields[i]));
+      if(valid === false) {
+        flag = false;
+        break;
+      }
+    }
+    return(flag);
   }
 
   validateAll() {
@@ -89,7 +147,7 @@ module.exports = class{
   }
 
   validate(fieldName) {
-    // TODO: format or cast
+    // TODO: format
     // TODO: assign error on failure
   }
 
