@@ -1,3 +1,5 @@
+import Schema from "./schema";
+const get = require("lodash/get");
 const isArray = require("lodash/isArray");
 const isBoolean = require("lodash/isBoolean");
 const isEqual = require("lodash/isEqual");
@@ -5,11 +7,10 @@ const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
 const isNumber = require("lodash/isNumber");
 const set = require("lodash/set");
-const get = require("lodash/get");
 
 module.exports = class{
   constructor(options = {}) {
-    this.schema = options.schema || {};
+    this.schema = options.schema || new Schema();
     this.data = options.data || {};
     this.errors = {};
     this.changeCallback = options.onChange || function() {};
@@ -19,20 +20,25 @@ module.exports = class{
   // ERRORS
   */
 
-  getErrors(fieldName) {
+  getError(fieldName) {
     return(this.errors[fieldName] || []);
   }
 
-  setErrors(errors, fieldName) {
-    if(isNil(fieldName)) {
-      this.errors = errors;
+  getErrors() {
+    return(this.errors);
+  }
+
+  setError(fieldName, errors) {
+    if(isEmpty(errors)) {
+      delete this.errors[fieldName];
     } else {
-      if(isEmpty(errors)) {
-        delete this.errors[fieldName];
-      } else {
-        this.errors[fieldName] = errors;
-      }
+      this.errors[fieldName] = errors;
     }
+    this.changeCallback();
+  }
+
+  setErrors(errors) {
+    this.errors = errors;
     this.changeCallback();
   }
 
@@ -48,14 +54,19 @@ module.exports = class{
     return(data);
   }
 
-  setValue(value, fieldName) {
-    if(isNil(fieldName)) {
-      // TODO: mask
-      this.data = {...this.data, ...value};
-    } else {
-      // TODO: mask
-      set(this.data, fieldName, value);
-    }
+  getValues() {
+    return(this.data);
+  }
+
+  setValue(fieldName, value) {
+    // TODO: mask
+    set(this.data, fieldName, value);
+    this.changeCallback();
+  }
+
+  setValues(values) {
+    // TODO: mask
+    this.data = {...this.data, ...values};
     this.changeCallback();
   }
 
@@ -67,7 +78,7 @@ module.exports = class{
     return(this.schema.isValidSync(this.data));
   }
 
-  validate(fieldName) {
+  validateAll() {
     // TODO: format or cast
     // TODO: assign error on failure
     /* this.schema.validate(value, { context: });
@@ -75,6 +86,11 @@ module.exports = class{
       console.log(err.name, err.errors);
     }); */
     // const rule = yup.reach(this.schema, fieldName);
+  }
+
+  validate(fieldName) {
+    // TODO: format or cast
+    // TODO: assign error on failure
   }
 
   /*

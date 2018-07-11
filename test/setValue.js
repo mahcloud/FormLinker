@@ -13,7 +13,7 @@ test("set value", t => {
   });
 
   t.deepEqual(fl.getValue("foo"), "bar");
-  fl.setValue("new bar", "foo");
+  fl.setValue("foo", "new bar");
   t.deepEqual(fl.getValue("foo"), "new bar");
   t.true(fl.isValid());
 });
@@ -33,7 +33,7 @@ test("set nested value", t => {
   });
 
   t.deepEqual(fl.getValue("foo.bar"), "cake");
-  fl.setValue("test", "foo.bar");
+  fl.setValue("foo.bar", "test");
   t.deepEqual(fl.getValue("foo.bar"), "test");
   t.true(fl.isValid());
 });
@@ -53,7 +53,7 @@ test("set nested value to null", t => {
   });
 
   t.deepEqual(fl.getValue("foo.bar"), "cake");
-  fl.setValue(null, "foo.bar");
+  fl.setValue("foo.bar", null);
   t.deepEqual(fl.getValue("foo.bar"), "");
   t.is(fl.isValid(), false);
 });
@@ -92,7 +92,7 @@ test("set nested value to null", t => {
   t.deepEqual(fl.getValue("girl.sad"), true);
   t.deepEqual(fl.getValue("boy.happy"), false);
   t.deepEqual(fl.getValue("boy.sad"), true);
-  fl.setValue({
+  fl.setValues({
     foo: 23,
     girl: {
       happy: true
