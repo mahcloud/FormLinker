@@ -13,17 +13,20 @@ module.exports = class{
     this.fields = this.calcFields();
     this.formatters = options.formatters || {};
     this.masks = options.masks || {};
+    // TODO original data
     this.data = options.data || {};
     this.errors = {};
     this.changeCallback = options.onChange || function() {};
   }
+  // TODO usse cloneDeep to make sure there are no references to data
 
+  // calcFields should be used only to instantiate the fields instance variable
   calcFields(schema = this.schema, prefix = "", fields = []) {
     Object.keys(schema).forEach((key) => {
       if(typeof schema[key] === "object") {
-        fields.concat(this.calcFields(schema[key], prefix + key + ".",  fields));
+        fields.concat(this.calcFields(schema[key], prefix + key + ".", fields));
       } else {
-	fields.push(prefix + key);
+        fields.push(prefix + key);
       }
     });
     return(fields);
@@ -33,23 +36,27 @@ module.exports = class{
   // ERRORS
   */
 
+  // getError gets the errors for a specific field
   getError(fieldName) {
     return(this.errors[fieldName] || []);
   }
 
+  // getErrors returns the entire error object
   getErrors() {
     return(this.errors);
   }
 
+  // setError removes errors data if an empty array or sets the errors. It also calls the changeCallback.
   setError(fieldName, errors) {
     if(isEmpty(errors)) {
       delete this.errors[fieldName];
     } else {
-      this.errors[fieldName] = errors;
+      set(this.errors, fieldName, errors);
     }
     this.changeCallback();
   }
 
+  // setErrors sets the errors object. It also calls the changeCallback.
   setErrors(errors) {
     this.errors = errors;
     this.changeCallback();
@@ -59,6 +66,7 @@ module.exports = class{
   // FIELDS
   */
 
+  // getValue gets the value of the field. Sets the value to an empty string if not an array, not a number, not a boolean, and empty.
   getValue(fieldName) {
     let data = get(this.data, fieldName);
     if(isEmpty(data) && !isBoolean(data) && !isNumber(data) && !isArray(data)) {
@@ -67,18 +75,22 @@ module.exports = class{
     return(data);
   }
 
+  // getValues returns the data object.
   getValues() {
     return(this.data);
   }
 
+  // setValue sets the field value to the masked value passed in. It also calls the changeCallback.
   setValue(fieldName, value) {
     set(this.data, fieldName, this.mask(fieldName, value));
     this.changeCallback();
   }
 
+  // setValues sets the field value to the masked value passed in. It also calls the changeCallback.
   setValues(values) {
-    // TODO: mask
-    this.data = {...this.data, ...values};
+    this.calcFields(values).forEach((fieldName) => {
+      set(this.data, fieldName, this.mask(fieldName, get(values, fieldName)));
+    });
     this.changeCallback();
   }
 
@@ -86,8 +98,10 @@ module.exports = class{
    * FORMATTING
   */
 
+  // format returns formatter results. If no formatter is defined for the schema key, then the formatter structure is returned assuming true.
   format(fieldName, value) {
     // TODO calculate options
+    // TODO handle chained formatters like required
     const key = get(this.schema, fieldName);
     if(isNil(this.formatters[key])) {
       return({
@@ -101,6 +115,7 @@ module.exports = class{
     }
   }
 
+  // formatAll formats all fields in schema.
   formatAll(values) {
     // TODO format all
     return(values);
@@ -110,6 +125,7 @@ module.exports = class{
    * MASKING
   */
 
+  // mask masks data based on schema key. If no mask is defined for the schema key, then the original value is returned.
   mask(fieldName, value) {
     // TODO calculate options
     const key = get(this.schema, fieldName);
@@ -155,15 +171,16 @@ module.exports = class{
   // Differences
   */
 
-  extractDifferences(original, fields) {
+  // extractDifferences returns an object of every key that has changed with the value it has changed to. This is great for sending only changes.
+  extractDifferences(original) {
     let differences = {};
     const data = this.data;
 
-    fields.forEach((field) => {
+    this.fields.forEach((field) => {
       if((isNil(get(original, field)) || get(original, field) === "") && (isNil(get(data, field)) || get(data, field) === "")) {
         // do nothing
       } else if(!isEqual(get(original, field), get(data, field))) {
-        differences[field] = get(data, field);
+        set(differences, field, get(data, field));
       }
     });
     return(differences);

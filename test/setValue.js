@@ -103,8 +103,8 @@ test("set nested value to null", t => {
   t.deepEqual(fl.getValue("foo"), 23);
   t.deepEqual(fl.getValue("bar"), 15);
   t.deepEqual(fl.getValue("girl.happy"), true);
-  t.deepEqual(fl.getValue("girl.sad"), "");
+  t.deepEqual(fl.getValue("girl.sad"), true);
   t.deepEqual(fl.getValue("boy.happy"), true);
-  t.deepEqual(fl.getValue("boy.sad"), "");
+  t.deepEqual(fl.getValue("boy.sad"), true);
   t.true(fl.isValid());
 });
