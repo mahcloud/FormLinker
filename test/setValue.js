@@ -53,7 +53,7 @@ test("set nested value to null", t => {
 
   t.deepEqual(fl.getValue("foo.bar"), "cake");
   fl.setValue("foo.bar", null);
-  t.deepEqual(fl.getValue("foo.bar"), "");
+  t.deepEqual(fl.getValue("foo.bar"), null);
   t.true(fl.isValid());
 });
 

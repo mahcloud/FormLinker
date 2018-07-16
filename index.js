@@ -13,10 +13,10 @@ module.exports = class{
     this.fields = this.calcFields();
     this.formatters = options.formatters || {};
     this.masks = options.masks || {};
-    // TODO original data
     this.data = {};
     this.setValues(options.data || {}, false);
     this.parsedData = options.data || {};
+    this.originalData = Object.assign({}, this.parsedData);
     this.errors = {};
     this.changeCallback = options.onChange || function() {};
   }
@@ -48,19 +48,23 @@ module.exports = class{
   }
 
   // setError removes errors data if an empty array or sets the errors. It also calls the changeCallback.
-  setError(fieldName, errors) {
+  setError(fieldName, errors, triggerCallback = true) {
     if(isEmpty(errors)) {
       delete this.errors[fieldName];
     } else {
       set(this.errors, fieldName, errors);
     }
-    this.changeCallback();
+    if(triggerCallback) {
+      this.changeCallback();
+    }
   }
 
   // setErrors sets the errors object. It also calls the changeCallback.
-  setErrors(errors) {
+  setErrors(errors, triggerCallback = true) {
     this.errors = errors;
-    this.changeCallback();
+    if(triggerCallback) {
+      this.changeCallback();
+    }
   }
 
   /*
@@ -69,11 +73,7 @@ module.exports = class{
 
   // getValue gets the value of the field. Sets the value to an empty string if not an array, not a number, not a boolean, and empty.
   getValue(fieldName) {
-    let data = get(this.data, fieldName);
-    if(isEmpty(data) && !isBoolean(data) && !isNumber(data) && !isArray(data)) {
-      return("");
-    }
-    return(data);
+    return(get(this.data, fieldName));
   }
 
   // getValues returns the data object.
@@ -93,7 +93,7 @@ module.exports = class{
   setValues(values, triggerCallback = true) {
     this.fields.forEach((fieldName) => {
       let value = get(values, fieldName);
-      if(!isNil(value)) {
+      if(typeof value !== "undefined") {
         set(this.data, fieldName, this.mask(fieldName, value));
       }
     });
@@ -108,24 +108,21 @@ module.exports = class{
 
   // format returns formatter results. If no formatter is defined for the schema key, then the formatter structure is returned assuming true.
   format(fieldName, value) {
-    // TODO handle chained formatters like required
     const key = get(this.schema, fieldName);
-    if(isNil(this.formatters[key])) {
-      return({
-        errors: [],
-        formatted: value,
-        parsed: value,
-        valid: true
-      });
-    } else {
-      return(this.formatters[key].format(value, {}));
-    }
-  }
+    let response = {
+      errors: [],
+      formatted: value,
+      parsed: value,
+      valid: true
+    };
 
-  // formatAll formats all fields in schema.
-  formatAll(values) {
-    // TODO format all
-    return(values);
+    key.split(".").forEach((formatter) => {
+      if(!isNil(this.formatters[formatter])) {
+        response = this.formatters[formatter].format(response.parsed);
+      }
+    });
+
+    return(response);
   }
 
   /*
@@ -134,12 +131,17 @@ module.exports = class{
 
   // mask masks data based on schema key. If no mask is defined for the schema key, then the original value is returned.
   mask(fieldName, value) {
+    // TODO handle chained masks like required
     const key = get(this.schema, fieldName);
-    if(isNil(this.formatters[key])) {
-      return(value);
-    } else {
-      return(this.masks[key].mask(value, {}));
-    }
+    let response = value;
+
+    key.split(".").forEach((mask) => {
+      if(!isNil(this.masks[mask])) {
+        response = this.masks[mask].mask(value);
+      }
+    });
+
+    return(response);
   }
 
   /*
@@ -158,19 +160,25 @@ module.exports = class{
     return(flag);
   }
 
-  validateAll() {
-    // TODO: format
-    // TODO: assign error on failure
-    /* this.schema.validate(value, { context: });
-    this.schema.validate(this.data).catch((err) => {
-      console.log(err.name, err.errors);
-    }); */
-    // const rule = yup.reach(this.schema, fieldName);
+  validate(fieldName, triggerCallback = true) {
+    const{errors, formatted, parsed} = this.format(fieldName, this.getValue(fieldName));
+    this.setError(fieldName, errors, false);
+    this.setValue(fieldName, formatted, false);
+    set(this.parsedData, fieldName, parsed);
+    
+    if(triggerCallback) {
+      this.changeCallback();
+    }
   }
 
-  validate(fieldName) {
-    // TODO: format
-    // TODO: assign error on failure
+  validateAll(triggerCallback = false) {
+    this.fields.forEach((field) => {
+      this.validate(field, false);
+    });
+
+    if(triggerCallback) {
+      this.changeCallback();
+    }
   }
 
   /*

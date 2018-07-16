@@ -173,6 +173,6 @@ test("Invalid deep data number", t => {
     }
   });
 
-  t.is(fl.getValue("foo.bar"), "");
+  t.is(fl.getValue("foo.bar"), null);
   t.true(fl.isValid());
 });
