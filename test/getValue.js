@@ -7,9 +7,7 @@ test("get value", t => {
       foo: "bar"
     },
     schema: {
-      schema: {
-        foo: "string"
-      }
+      foo: "string"
     }
   });
 
