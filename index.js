@@ -1,10 +1,7 @@
 const get = require("lodash/get");
-const isArray = require("lodash/isArray");
-const isBoolean = require("lodash/isBoolean");
 const isEqual = require("lodash/isEqual");
 const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
-const isNumber = require("lodash/isNumber");
 const set = require("lodash/set");
 
 module.exports = class{
@@ -164,7 +161,7 @@ module.exports = class{
     this.setError(fieldName, errors, false);
     this.setValue(fieldName, formatted, false);
     set(this.parsedData, fieldName, parsed);
-    
+
     if(triggerCallback) {
       this.changeCallback();
     }
