@@ -1,4 +1,8 @@
 {
   "presets": [["env", {"modules": false}]],
-  "plugins": ["transform-es2015-modules-commonjs", "array-includes"]
+  "plugins": [
+    "transform-es2015-modules-commonjs",
+    "array-includes",
+    "transform-object-rest-spread"
+]
 }

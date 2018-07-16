@@ -1,161 +1,198 @@
-const isArray = require("lodash/isArray");
-const isBoolean = require("lodash/isBoolean");
+const get = require("lodash/get");
 const isEqual = require("lodash/isEqual");
 const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
-const isNumber = require("lodash/isNumber");
-const isObject = require("lodash/isObject");
 const set = require("lodash/set");
-const get = require("lodash/get");
 
 module.exports = class{
   constructor(options = {}) {
-    this.fields = {};
-    this.data = options.data || {};
-    this.errorData = {};
-    this.changeCallback = options.onChange;
+    this.schema = options.schema || {};
+    this.fields = this.calcFields();
+    this.formatters = options.formatters || {};
+    this.masks = options.masks || {};
+    this.data = {};
+    this.setValues(options.data || {}, false);
+    this.parsedData = options.data || {};
+    this.originalData = Object.assign({}, this.parsedData);
+    this.errors = {};
+    this.changeCallback = options.onChange || function() {};
+  }
+
+  // calcFields should be used only to instantiate the fields instance variable
+  calcFields(schema = this.schema, prefix = "", fields = []) {
+    Object.keys(schema).forEach((key) => {
+      if(typeof schema[key] === "object") {
+        fields.concat(this.calcFields(schema[key], prefix + key + ".", fields));
+      } else {
+        fields.push(prefix + key);
+      }
+    });
+    return(fields);
+  }
+
+  /*
+  // ERRORS
+  */
+
+  // getError gets the errors for a specific field
+  getError(fieldName) {
+    return(get(this.errors, fieldName) || []);
+  }
+
+  // getErrors returns the entire error object
+  getErrors() {
+    return(this.errors);
+  }
+
+  // setError removes errors data if an empty array or sets the errors. It also calls the changeCallback.
+  setError(fieldName, errors, triggerCallback = true) {
+    if(isEmpty(errors)) {
+      delete this.errors[fieldName];
+    } else {
+      set(this.errors, fieldName, errors);
+    }
+    if(triggerCallback) {
+      this.changeCallback();
+    }
+  }
+
+  // setErrors sets the errors object. It also calls the changeCallback.
+  setErrors(errors, triggerCallback = true) {
+    this.errors = errors;
+    if(triggerCallback) {
+      this.changeCallback();
+    }
   }
 
   /*
   // FIELDS
   */
 
-  clearFieldErrors(attrName) {
-    this.updateErrors(attrName, {});
+  // getValue gets the value of the field. Sets the value to an empty string if not an array, not a number, not a boolean, and empty.
+  getValue(fieldName) {
+    return(get(this.data, fieldName));
   }
 
-  focusOnField(attrName) {
-    if(!isNil(this.fields[attrName].refs["input"])) {
-      this.fields[attrName].refs["input"].focus();
-      this.fields[attrName].refs["input"].setSelectionRange(9999, 9999);
-    }
+  // getValues returns the data object.
+  getValues() {
+    return(this.data);
   }
 
-  getFieldErrors(attrName) {
-    return(this.errorData[attrName] || []);
-  }
-
-  getFieldFormValue(attrName) {
-    let data = get(this.data, attrName);
-    if(isEmpty(data) && !isBoolean(data) && !isNumber(data) && !isArray(data)) {
-      return("");
-    }
-    return(data);
-  }
-
-  handleFieldChange(attrName, results) {
-    if(isObject(results) && results.hasOwnProperty("formatted")) {
-      this.updateFormValue(attrName, results.formatted);
-    } else if(isObject(results) && results.hasOwnProperty("parsed")) {
-      this.updateParsedValue(attrName, results.parsed);
-    } else {
-      this.updateFormValue(attrName, results);
-      this.updateParsedValue(attrName, results);
-    }
-    this.fields[attrName].handleUpdate();
-    if(typeof(this.changeCallback) === "function") {
+  // setValue sets the field value to the masked value passed in. It also calls the changeCallback.
+  setValue(fieldName, value, triggerCallback = true) {
+    set(this.data, fieldName, this.mask(fieldName, value));
+    if(triggerCallback) {
       this.changeCallback();
     }
   }
 
-  handleFieldBlur(attrName, results) {
-    this.updateFormValue(attrName, results.formatted);
-    this.updateParsedValue(attrName, results.formatted);
-    this.updateErrors(attrName, results.errors);
-  }
-
-  registerField(name, input) {
-    this.fields[name] = input;
-  }
-
-  setFieldErrors(attrName, errors) {
-    this.updateErrors(attrName, errors);
-  }
-
-  unregisterField(name, input) {
-    delete this.fields[name];
-  }
-
-  updateAllFields() {
-    for(let key in this.fields) {
-      this.fields[key].handleUpdate();
+  // setValues sets the field value to the masked value passed in. It also calls the changeCallback.
+  setValues(values, triggerCallback = true) {
+    this.fields.forEach((fieldName) => {
+      let value = get(values, fieldName);
+      if(typeof value !== "undefined") {
+        set(this.data, fieldName, this.mask(fieldName, value));
+      }
+    });
+    if(triggerCallback) {
+      this.changeCallback();
     }
   }
 
   /*
-  // FORM
+   * FORMATTING
   */
 
-  extractDifferences(original, fields) {
+  // format returns formatter results. If no formatter is defined for the schema key, then the formatter structure is returned assuming true.
+  format(fieldName, value) {
+    const key = get(this.schema, fieldName);
+    let response = {
+      errors: [],
+      formatted: value,
+      parsed: value,
+      valid: true
+    };
+
+    key.split(".").forEach((formatter) => {
+      if(!isNil(this.formatters[formatter])) {
+        response = this.formatters[formatter].format(response.parsed);
+      }
+    });
+
+    return(response);
+  }
+
+  /*
+   * MASKING
+  */
+
+  // mask masks data based on schema key. If no mask is defined for the schema key, then the original value is returned.
+  mask(fieldName, value) {
+    const key = get(this.schema, fieldName);
+    let response = value;
+
+    key.split(".").forEach((mask) => {
+      if(!isNil(this.masks[mask])) {
+        response = this.masks[mask].mask(value);
+      }
+    });
+
+    return(response);
+  }
+
+  /*
+   * VALIDATION
+  */
+
+  isValid() {
+    let flag = true;
+    for(let i = 0; i < this.fields.length; i++) {
+      const{valid} = this.format(this.fields[i], this.getValue(this.fields[i]));
+      if(valid === false) {
+        flag = false;
+        break;
+      }
+    }
+    return(flag);
+  }
+
+  validate(fieldName, triggerCallback = true) {
+    const{errors, formatted, parsed} = this.format(fieldName, this.getValue(fieldName));
+    this.setError(fieldName, errors, false);
+    this.setValue(fieldName, formatted, false);
+    set(this.parsedData, fieldName, parsed);
+
+    if(triggerCallback) {
+      this.changeCallback();
+    }
+  }
+
+  validateAll(triggerCallback = false) {
+    this.fields.forEach((field) => {
+      this.validate(field, false);
+    });
+
+    if(triggerCallback) {
+      this.changeCallback();
+    }
+  }
+
+  /*
+  // Differences
+  */
+
+  // extractDifferences returns an object of every key that has changed with the value it has changed to. This is great for sending only changes.
+  extractDifferences(original) {
     let differences = {};
     const data = this.data;
 
-    if(isNil(fields)) {
-      fields = Object.keys(this.fields);
-    }
-
-    fields.forEach((field) => {
+    this.fields.forEach((field) => {
       if((isNil(get(original, field)) || get(original, field) === "") && (isNil(get(data, field)) || get(data, field) === "")) {
         // do nothing
       } else if(!isEqual(get(original, field), get(data, field))) {
-        differences[field] = get(data, field);
+        set(differences, field, get(data, field));
       }
     });
     return(differences);
-  }
-
-  isValid() {
-    let valid = true;
-    for(let key in this.fields) {
-      if(!this.fields[key].formattedValue().valid) {
-        valid = false;
-      }
-    }
-    return(valid);
-  }
-
-  registerForm(form) {
-    this.form = form;
-
-    this.updateAllFields();
-  }
-
-  setFormData(data) {
-    Object.keys(this.fields).forEach((attrName) => {
-      let attrValue = data[attrName];
-      if(!isNil(attrValue)) {
-        this.handleFieldChange(attrName, {formatted: attrValue, parsed: attrValue});
-      }
-    });
-  }
-
-  setFormErrors(errors) {
-    Object.keys(this.fields).forEach((attrName) => {
-      let attrErrors = errors[attrName];
-      if(!isNil(attrErrors)) {
-        this.updateErrors(attrName, attrErrors);
-      }
-    });
-  }
-
-  triggerValidations() {
-    for(let key in this.fields) {
-      this.fields[key].blur();
-    }
-  }
-
-  updateFormValue(attr, value) {
-    set(this.data, attr, value);
-  }
-
-  updateErrors(attr, newErrors) {
-    if(isEmpty(newErrors)) {
-      delete this.errorData[attr];
-    } else {
-      this.errorData[attr] = newErrors;
-    }
-    if(!isNil(this.fields[attr])) {
-      this.fields[attr].handleUpdate();
-    }
   }
 };
