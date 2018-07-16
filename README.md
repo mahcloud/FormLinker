@@ -4,8 +4,6 @@
 
 Links form elements to each other.
 
-This library is built with React in mind.
-
 ## Install
 
 npm i --save form-linker
@@ -15,13 +13,29 @@ npm i --save form-linker
 Basic
 
 ```js
+import { EmailFormatter, EmailMask, NumberFormatter, NumberMask, RequiredFormatter } from "form-formatter";
+
 class Example extends React.Component {
   constructor(props) {
     super(props);
 
     this.fl = new FormLinker({
       data: {
-        foo: "bar"
+        age: 23,
+	email: "test@test.com"
+      },
+      schema: {
+        age: "number.required",
+	email: "email.required"
+      },
+      formatters: {
+        "email": EmailFormatter,
+        "number": NumberFormatter,
+        "required": RequiredFormatter
+      },
+      masks: {
+        "email": EmailMask,
+        "number": NumberMask
       },
       onChange: () => this.forceUpdate()
     });
@@ -44,26 +58,72 @@ class Input extends React.Component {
 
   render() {
     return(
-      <input value={this.props.formLinker.getFieldValue(this.props.name)}/>
+      <input value={this.props.formLinker.getValue(this.props.name)} onChange={(e) => this.props.formLinker.setValue(this.props.name, e.target.value)} onBlur={() => this.props.formLinker.validate(this.props.name)}/>
     );
   }
 }
 ```
 
+## Constructor options
+
+### data
+
+Provide initial data for the form.
+
+
+### schema
+
+Provide structure of data as nested object with dot deliminated string values.
+
+Each string is represented in the formatters and masks options. When validating the schema uses the formatters to validate each form field. When setting a value the masks are used to limit user input.
+
+
+### Formatters
+
+Object where keys match schema string values and values map to the formatter to handle values.
+
+Formatters should have a format function that takes a single value.
+
+Formatters should return data in an object like:
+
+```json
+{
+errors: [],
+formatted: "$1,000.00",
+parsed: 1000.00,
+valid: true
+}
+```
+
+
+### Masks
+
+Object where keys match schema string values and values map to the mask to handle values.
+
+Makes should have a mask function that takes a single value and returns a single value.
+
+
 ## Functions
 
-getErrors(fieldName // String)
+### Error Functions
+getError(fieldName // String)
 
 Returns an array of errors for the specified fieldName.
 
 
-setErrors(errors // Array, fieldName // String)
+getErrors()
+
+Returns all errors in the same structure as the schema.
+
+
+setError(fieldName // String, errors // Array)
 
 Sets errors for the specified fieldName
 
-setErrors([], fieldName // String)
+setError(fieldName // String, [])
 
 Clears errors on the specified fieldName.
+
 
 setErrors(errors // Object)
 
@@ -72,19 +132,43 @@ Sets errors for all keys in object. Uses key/attr as fieldName and value as erro
 When setting an object of errors, we assume that the developer wants to clear out all previous errors and start with a new error set as defined. So when calling this function, all previous errors are removed.
 
 
+### Value Functions
+
 getValue(fieldName // String)
 
 Returns value for the specified fieldName.
 
 
-setValue(value \\ Anything, fieldName \\ String)
+getValues()
+
+Returns all values in the structure of the schema.
+
+
+setValue(fieldName \\ String, value \\ Anything)
 
 Sets value for the specified fieldName
 
-setValue(value \\ Object)
+setValues(value \\ Object)
 
 Sets values for all keys in object. Uses key/attr as fieldName and value as value.
 
+
+### Validating Functions
+
+isValid()
+
+Returns a boolean of whether the form is valid or not. This uses the schema to check validation.
+
+validate(fieldName // String)
+
+Returns null. This function sets errors and formatting for the specified fieldName.
+
+validateAll()
+
+Returns null. Calls validate on all fields in the schema.
+
+
+### Differences Functions
 
 extractDifferences(original \\ Object, fields \\ Array)
 
