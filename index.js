@@ -14,11 +14,12 @@ module.exports = class{
     this.formatters = options.formatters || {};
     this.masks = options.masks || {};
     // TODO original data
-    this.data = options.data || {};
+    this.data = {};
+    this.setValues(options.data || {}, false);
+    this.parsedData = options.data || {};
     this.errors = {};
     this.changeCallback = options.onChange || function() {};
   }
-  // TODO usse cloneDeep to make sure there are no references to data
 
   // calcFields should be used only to instantiate the fields instance variable
   calcFields(schema = this.schema, prefix = "", fields = []) {
@@ -38,7 +39,7 @@ module.exports = class{
 
   // getError gets the errors for a specific field
   getError(fieldName) {
-    return(this.errors[fieldName] || []);
+    return(get(this.errors, fieldName) || []);
   }
 
   // getErrors returns the entire error object
@@ -81,17 +82,24 @@ module.exports = class{
   }
 
   // setValue sets the field value to the masked value passed in. It also calls the changeCallback.
-  setValue(fieldName, value) {
+  setValue(fieldName, value, triggerCallback = true) {
     set(this.data, fieldName, this.mask(fieldName, value));
-    this.changeCallback();
+    if(triggerCallback) {
+      this.changeCallback();
+    }
   }
 
   // setValues sets the field value to the masked value passed in. It also calls the changeCallback.
-  setValues(values) {
-    this.calcFields(values).forEach((fieldName) => {
-      set(this.data, fieldName, this.mask(fieldName, get(values, fieldName)));
+  setValues(values, triggerCallback = true) {
+    this.fields.forEach((fieldName) => {
+      let value = get(values, fieldName);
+      if(!isNil(value)) {
+        set(this.data, fieldName, this.mask(fieldName, value));
+      }
     });
-    this.changeCallback();
+    if(triggerCallback) {
+      this.changeCallback();
+    }
   }
 
   /*
@@ -100,7 +108,6 @@ module.exports = class{
 
   // format returns formatter results. If no formatter is defined for the schema key, then the formatter structure is returned assuming true.
   format(fieldName, value) {
-    // TODO calculate options
     // TODO handle chained formatters like required
     const key = get(this.schema, fieldName);
     if(isNil(this.formatters[key])) {
@@ -127,7 +134,6 @@ module.exports = class{
 
   // mask masks data based on schema key. If no mask is defined for the schema key, then the original value is returned.
   mask(fieldName, value) {
-    // TODO calculate options
     const key = get(this.schema, fieldName);
     if(isNil(this.formatters[key])) {
       return(value);
@@ -153,7 +159,7 @@ module.exports = class{
   }
 
   validateAll() {
-    // TODO: format or cast
+    // TODO: format
     // TODO: assign error on failure
     /* this.schema.validate(value, { context: });
     this.schema.validate(this.data).catch((err) => {
