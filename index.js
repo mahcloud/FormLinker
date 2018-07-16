@@ -131,7 +131,6 @@ module.exports = class{
 
   // mask masks data based on schema key. If no mask is defined for the schema key, then the original value is returned.
   mask(fieldName, value) {
-    // TODO handle chained masks like required
     const key = get(this.schema, fieldName);
     let response = value;
 
