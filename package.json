@@ -1,6 +1,6 @@
 {
   "name": "form-linker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "Links form elements to each other.",
   "author": "AlchemyAlcove",
