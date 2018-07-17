@@ -53,10 +53,6 @@ class Example extends React.Component {
 }
 
 class Input extends React.Component {
-  componentDidMount() {
-    this.fl.registerField(this.props.name, this);
-  }
-
   render() {
     return(
       <input value={this.props.formLinker.getValue(this.props.name)} onChange={(e) => this.props.formLinker.setValue(this.props.name, e.target.value)} onBlur={() => this.props.formLinker.validate(this.props.name)}/>
