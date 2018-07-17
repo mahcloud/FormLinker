@@ -175,11 +175,13 @@ module.exports = function () {
         valid: true
       };
 
-      key.split(".").forEach(function (formatter) {
-        if (!isNil(_this3.formatters[formatter])) {
-          response = _this3.formatters[formatter].format(response.parsed);
-        }
-      });
+      if (!isNil(key)) {
+        key.split(".").forEach(function (formatter) {
+          if (!isNil(_this3.formatters[formatter])) {
+            response = _this3.formatters[formatter].format(response.parsed);
+          }
+        });
+      }
 
       return response;
     }
@@ -198,11 +200,13 @@ module.exports = function () {
       var key = get(this.schema, fieldName);
       var response = value;
 
-      key.split(".").forEach(function (mask) {
-        if (!isNil(_this4.masks[mask])) {
-          response = _this4.masks[mask].mask(value);
-        }
-      });
+      if (!isNil(key)) {
+        key.split(".").forEach(function (mask) {
+          if (!isNil(_this4.masks[mask])) {
+            response = _this4.masks[mask].mask(value);
+          }
+        });
+      }
 
       return response;
     }

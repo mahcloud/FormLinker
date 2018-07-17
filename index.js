@@ -113,11 +113,13 @@ module.exports = class{
       valid: true
     };
 
-    key.split(".").forEach((formatter) => {
-      if(!isNil(this.formatters[formatter])) {
-        response = this.formatters[formatter].format(response.parsed);
-      }
-    });
+    if(!isNil(key)) {
+      key.split(".").forEach((formatter) => {
+        if(!isNil(this.formatters[formatter])) {
+          response = this.formatters[formatter].format(response.parsed);
+        }
+      });
+    }
 
     return(response);
   }
@@ -131,11 +133,13 @@ module.exports = class{
     const key = get(this.schema, fieldName);
     let response = value;
 
-    key.split(".").forEach((mask) => {
-      if(!isNil(this.masks[mask])) {
-        response = this.masks[mask].mask(value);
-      }
-    });
+    if(!isNil(key)) {
+      key.split(".").forEach((mask) => {
+        if(!isNil(this.masks[mask])) {
+          response = this.masks[mask].mask(value);
+        }
+      });
+    }
 
     return(response);
   }
