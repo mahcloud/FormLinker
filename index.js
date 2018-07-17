@@ -15,6 +15,8 @@ module.exports = class{
     this.parsedData = options.data || {};
     this.originalData = Object.assign({}, this.parsedData);
     this.errors = {};
+    this.validateAll(false);
+    this.errors = {};
     this.changeCallback = options.onChange || function() {};
   }
 
@@ -198,5 +200,16 @@ module.exports = class{
       }
     });
     return(differences);
+  }
+
+  /*
+   * SCHEMA
+  */
+
+  updateSchema(schema) {
+    this.schema = schema || {};
+    this.fields = this.calcFields();
+    this.validateAll();
+    this.errors = {};
   }
 };

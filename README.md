@@ -141,11 +141,11 @@ getValues()
 Returns all values in the structure of the schema.
 
 
-setValue(fieldName \\ String, value \\ Anything)
+setValue(fieldName // String, value // Anything)
 
 Sets value for the specified fieldName
 
-setValues(value \\ Object)
+setValues(value // Object)
 
 Sets values for all keys in object. Uses key/attr as fieldName and value as value.
 
@@ -167,10 +167,17 @@ Returns null. Calls validate on all fields in the schema.
 
 ### Differences Functions
 
-extractDifferences(original \\ Object, fields \\ Array)
+extractDifferences(original // Object, fields // Array)
 
 Returns a differences object. Each key represents a field with changes from the original data. The value of the object represents the current value.
 
 original represents the original data set.
 
 Fields represents an array of strings specifying the fields to check.
+
+
+### Update Schema Functions
+
+updateSchema(schema // Object)
+
+Changes schema and reruns validation and clears errors. This means masking and formatting is rerun.
