@@ -24,7 +24,7 @@ module.exports = class{
   calcFields(schema = this.schema, prefix = "", fields = []) {
     Object.keys(schema).forEach((key) => {
       if(typeof schema[key] === "object") {
-        fields.concat(this.calcFields(schema[key], prefix + key + ".", fields));
+        this.calcFields(schema[key], prefix + key + ".", fields);
       } else {
         fields.push(prefix + key);
       }
