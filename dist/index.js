@@ -180,7 +180,7 @@ module.exports = function () {
       if (!isNil(key)) {
         key.split(".").forEach(function (formatter) {
           if (!isNil(_this3.formatters[formatter])) {
-            var newResponse = _this3.formatters[formatter].format(response.parsed);
+            var newResponse = _this3.formatters[formatter].format(response.formatted);
             response = {
               errors: response.errors.concat(newResponse.errors),
               formatted: newResponse.formatted,
