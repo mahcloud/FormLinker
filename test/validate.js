@@ -17,7 +17,27 @@ test("validate", t => {
   t.true(fl.isValid());
 });
 
-test("multiple formatters", t => {
+test("multiple formatters valid", t => {
+  const formatters = {
+    "cc": CreditCardFormatter,
+    "required": RequiredFormatter
+  };
+
+  let fl = new FormLinker({
+    data: {
+      cc: "1234-1234-1234-1234"
+    },
+    formatters: formatters,
+    schema: {
+      cc: "cc.required"
+    }
+  });
+
+  fl.validate("cc");
+  t.deepEqual(fl.getError("cc"), []);
+});
+
+test("multiple formatters invalid", t => {
   const formatters = {
     "cc": CreditCardFormatter,
     "required": RequiredFormatter
