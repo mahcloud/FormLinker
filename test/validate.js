@@ -1,6 +1,6 @@
 import test from "ava";
 import FormLinker from "../";
-import { NumberFormatter, RequiredFormatter } from "form-formatters";
+import { CreditCardFormatter, NumberFormatter, RequiredFormatter } from "form-formatters";
 
 test("validate", t => {
   let fl = new FormLinker({
@@ -8,15 +8,33 @@ test("validate", t => {
       foo: null
     },
     schema: {
-      schema: {
-        foo: "string"
-      }
+      foo: "string"
     }
   });
 
   fl.validateAll();
   t.deepEqual(fl.getError("foo"), []);
   t.true(fl.isValid());
+});
+
+test("multiple formatters", t => {
+  const formatters = {
+    "cc": CreditCardFormatter,
+    "required": RequiredFormatter
+  };
+
+  let fl = new FormLinker({
+    data: {
+      cc: "1234"
+    },
+    formatters: formatters,
+    schema: {
+      cc: "cc.required"
+    }
+  });
+
+  fl.validate("cc");
+  t.deepEqual(fl.getError("cc"), ["FormFormatters.creditCardInvalid"]);
 });
 
 test("complex validate", t => {

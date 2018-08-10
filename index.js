@@ -118,7 +118,13 @@ module.exports = class{
     if(!isNil(key)) {
       key.split(".").forEach((formatter) => {
         if(!isNil(this.formatters[formatter])) {
-          response = this.formatters[formatter].format(response.parsed);
+          let newResponse = this.formatters[formatter].format(response.parsed);
+          response = {
+            errors: response.errors.concat(newResponse.errors),
+            formatted: newResponse.formatted,
+            parsed: newResponse.parsed,
+            valid: response.valid && newResponse.valid
+          };
         }
       });
     }
