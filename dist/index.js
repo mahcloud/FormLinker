@@ -27,6 +27,8 @@ module.exports = function () {
     this.parsedData = options.data || {};
     this.originalData = Object.assign({}, this.parsedData);
     this.errors = {};
+    this.validateAll(false);
+    this.errors = {};
     this.changeCallback = options.onChange || function () {};
   }
 
@@ -45,7 +47,7 @@ module.exports = function () {
 
       Object.keys(schema).forEach(function (key) {
         if (_typeof(schema[key]) === "object") {
-          fields.concat(_this.calcFields(schema[key], prefix + key + ".", fields));
+          _this.calcFields(schema[key], prefix + key + ".", fields);
         } else {
           fields.push(prefix + key);
         }
@@ -178,7 +180,13 @@ module.exports = function () {
       if (!isNil(key)) {
         key.split(".").forEach(function (formatter) {
           if (!isNil(_this3.formatters[formatter])) {
-            response = _this3.formatters[formatter].format(response.parsed);
+            var newResponse = _this3.formatters[formatter].format(response.parsed);
+            response = {
+              errors: response.errors.concat(newResponse.errors),
+              formatted: newResponse.formatted,
+              parsed: newResponse.parsed,
+              valid: response.valid && newResponse.valid
+            };
           }
         });
       }
@@ -284,6 +292,19 @@ module.exports = function () {
         }
       });
       return differences;
+    }
+
+    /*
+     * SCHEMA
+    */
+
+  }, {
+    key: "updateSchema",
+    value: function updateSchema(schema) {
+      this.schema = schema || {};
+      this.fields = this.calcFields();
+      this.validateAll();
+      this.errors = {};
     }
   }]);
 
