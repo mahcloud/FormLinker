@@ -1,6 +1,6 @@
 import test from "ava";
 import FormLinker from "../";
-import { CreditCardFormatter, NumberFormatter, RequiredFormatter } from "form-formatters";
+import { CreditCardFormatter, DateFormatter, NumberFormatter, RequiredFormatter, WholeFormatter } from "form-formatters";
 
 test("validate", t => {
   let fl = new FormLinker({
@@ -35,6 +35,49 @@ test("multiple formatters valid", t => {
 
   fl.validate("cc");
   t.deepEqual(fl.getError("cc"), []);
+});
+
+test("multiple formatters date valid", t => {
+  const formatters = {
+    "date": DateFormatter,
+    "required": RequiredFormatter
+  };
+
+  let fl = new FormLinker({
+    data: {
+      date: "10 10 2010"
+    },
+    formatters: formatters,
+    schema: {
+      date: "date.required"
+    }
+  });
+
+  fl.validate("date");
+  t.deepEqual(fl.getError("date"), []);
+  t.deepEqual(fl.getValue("date"), "Oct 10, 2010");
+});
+
+test("multiple formatters num.whole valid", t => {
+  const formatters = {
+    "num": NumberFormatter,
+    "required": RequiredFormatter,
+    "whole": WholeFormatter
+  };
+
+  let fl = new FormLinker({
+    data: {
+      whole: "23"
+    },
+    formatters: formatters,
+    schema: {
+      whole: "num.whole.required"
+    }
+  });
+
+  fl.validate("whole");
+  t.deepEqual(fl.getError("whole"), []);
+  t.deepEqual(fl.getValue("whole"), "23");
 });
 
 test("multiple formatters invalid", t => {
@@ -101,9 +144,9 @@ test("complex validate", t => {
     }
   });
 
-  t.deepEqual(fl.getValue("foo"), 23);
+  t.deepEqual(fl.getValue("foo"), "23");
   fl.validate("foo");
-  t.deepEqual(fl.getValue("foo"), 23);
+  t.deepEqual(fl.getValue("foo"), "23");
   fl.setValue("foo", null);
   t.deepEqual(fl.getError("foo"), []);
   t.deepEqual(fl.getValue("foo"), null);

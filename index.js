@@ -118,7 +118,7 @@ module.exports = class{
     if(!isNil(key)) {
       key.split(".").forEach((formatter) => {
         if(!isNil(this.formatters[formatter])) {
-          let newResponse = this.formatters[formatter].format(response.parsed);
+          let newResponse = this.formatters[formatter].format(response.formatted);
           response = {
             errors: response.errors.concat(newResponse.errors),
             formatted: newResponse.formatted,
