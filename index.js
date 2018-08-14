@@ -8,14 +8,13 @@ module.exports = class{
   constructor(options = {}) {
     this.schema = options.schema || {};
     this.fields = this.calcFields();
+    this.converters = options.converters || {};
     this.formatters = options.formatters || {};
     this.masks = options.masks || {};
     this.data = {};
-    this.setValues(options.data || {}, false);
+    this.setValuesFromParsed(options.data || {}, false);
     this.parsedData = options.data || {};
     this.originalData = Object.assign({}, this.parsedData);
-    this.errors = {};
-    this.validateAll(false);
     this.errors = {};
     this.changeCallback = options.onChange || function() {};
   }
@@ -30,6 +29,20 @@ module.exports = class{
       }
     });
     return(fields);
+  }
+
+  convert(fieldName, value) {
+    const key = get(this.schema, fieldName);
+
+    if(!isNil(key)) {
+      key.split(".").forEach((converter) => {
+        if(!isNil(this.converters[converter])) {
+          value = this.converters[converter](value);
+        }
+      });
+    }
+
+    return(value);
   }
 
   /*
@@ -67,7 +80,7 @@ module.exports = class{
   }
 
   /*
-  // FIELDS
+  // VALUES
   */
 
   // getValue gets the value of the field. Sets the value to an empty string if not an array, not a number, not a boolean, and empty.
@@ -93,12 +106,21 @@ module.exports = class{
     this.fields.forEach((fieldName) => {
       let value = get(values, fieldName);
       if(typeof value !== "undefined") {
-        set(this.data, fieldName, this.mask(fieldName, value));
+        this.setValue(fieldName, value, false);
       }
     });
     if(triggerCallback) {
       this.changeCallback();
     }
+  }
+
+  setValuesFromParsed(values) {
+    this.fields.forEach((fieldName) => {
+      let value = get(values, fieldName);
+      if(typeof value !== "undefined") {
+        set(this.data, fieldName, this.convert(fieldName, value));
+      }
+    });
   }
 
   /*
@@ -118,13 +140,7 @@ module.exports = class{
     if(!isNil(key)) {
       key.split(".").forEach((formatter) => {
         if(!isNil(this.formatters[formatter])) {
-          let newResponse = this.formatters[formatter].format(response.formatted);
-          response = {
-            errors: response.errors.concat(newResponse.errors),
-            formatted: newResponse.formatted,
-            parsed: newResponse.parsed,
-            valid: response.valid && newResponse.valid
-          };
+          response = this.formatters[formatter](response);
         }
       });
     }

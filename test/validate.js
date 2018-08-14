@@ -144,7 +144,7 @@ test("complex validate", t => {
     }
   });
 
-  t.deepEqual(fl.getValue("foo"), "23");
+  t.deepEqual(fl.getValue("foo"), 23);
   fl.validate("foo");
   t.deepEqual(fl.getValue("foo"), "23");
   fl.setValue("foo", null);
