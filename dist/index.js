@@ -20,14 +20,13 @@ module.exports = function () {
 
     this.schema = options.schema || {};
     this.fields = this.calcFields();
+    this.converters = options.converters || {};
     this.formatters = options.formatters || {};
     this.masks = options.masks || {};
     this.data = {};
-    this.setValues(options.data || {}, false);
+    this.setValuesFromParsed(options.data || {}, false);
     this.parsedData = options.data || {};
     this.originalData = Object.assign({}, this.parsedData);
-    this.errors = {};
-    this.validateAll(false);
     this.errors = {};
     this.changeCallback = options.onChange || function () {};
   }
@@ -53,6 +52,23 @@ module.exports = function () {
         }
       });
       return fields;
+    }
+  }, {
+    key: "convert",
+    value: function convert(fieldName, value) {
+      var _this2 = this;
+
+      var key = get(this.schema, fieldName);
+
+      if (!isNil(key)) {
+        key.split(".").forEach(function (converter) {
+          if (!isNil(_this2.converters[converter])) {
+            value = _this2.converters[converter](value);
+          }
+        });
+      }
+
+      return value;
     }
 
     /*
@@ -106,7 +122,7 @@ module.exports = function () {
     }
 
     /*
-    // FIELDS
+    // VALUES
     */
 
     // getValue gets the value of the field. Sets the value to an empty string if not an array, not a number, not a boolean, and empty.
@@ -143,19 +159,31 @@ module.exports = function () {
   }, {
     key: "setValues",
     value: function setValues(values) {
-      var _this2 = this;
+      var _this3 = this;
 
       var triggerCallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       this.fields.forEach(function (fieldName) {
         var value = get(values, fieldName);
         if (typeof value !== "undefined") {
-          set(_this2.data, fieldName, _this2.mask(fieldName, value));
+          _this3.setValue(fieldName, value, false);
         }
       });
       if (triggerCallback) {
         this.changeCallback();
       }
+    }
+  }, {
+    key: "setValuesFromParsed",
+    value: function setValuesFromParsed(values) {
+      var _this4 = this;
+
+      this.fields.forEach(function (fieldName) {
+        var value = get(values, fieldName);
+        if (typeof value !== "undefined") {
+          set(_this4.data, fieldName, _this4.convert(fieldName, value));
+        }
+      });
     }
 
     /*
@@ -167,7 +195,7 @@ module.exports = function () {
   }, {
     key: "format",
     value: function format(fieldName, value) {
-      var _this3 = this;
+      var _this5 = this;
 
       var key = get(this.schema, fieldName);
       var response = {
@@ -179,14 +207,8 @@ module.exports = function () {
 
       if (!isNil(key)) {
         key.split(".").forEach(function (formatter) {
-          if (!isNil(_this3.formatters[formatter])) {
-            var newResponse = _this3.formatters[formatter].format(response.formatted);
-            response = {
-              errors: response.errors.concat(newResponse.errors),
-              formatted: newResponse.formatted,
-              parsed: newResponse.parsed,
-              valid: response.valid && newResponse.valid
-            };
+          if (!isNil(_this5.formatters[formatter])) {
+            response = _this5.formatters[formatter](response);
           }
         });
       }
@@ -203,15 +225,15 @@ module.exports = function () {
   }, {
     key: "mask",
     value: function mask(fieldName, value) {
-      var _this4 = this;
+      var _this6 = this;
 
       var key = get(this.schema, fieldName);
       var response = value;
 
       if (!isNil(key)) {
         key.split(".").forEach(function (mask) {
-          if (!isNil(_this4.masks[mask])) {
-            response = _this4.masks[mask].mask(value);
+          if (!isNil(_this6.masks[mask])) {
+            response = _this6.masks[mask].mask(value);
           }
         });
       }
@@ -259,12 +281,12 @@ module.exports = function () {
   }, {
     key: "validateAll",
     value: function validateAll() {
-      var _this5 = this;
+      var _this7 = this;
 
-      var triggerCallback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var triggerCallback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
       this.fields.forEach(function (field) {
-        _this5.validate(field, false);
+        _this7.validate(field, false);
       });
 
       if (triggerCallback) {
