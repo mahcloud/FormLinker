@@ -195,7 +195,7 @@ module.exports = class{
     }
   }
 
-  validateAll(triggerCallback = false) {
+  validateAll(triggerCallback = true) {
     this.fields.forEach((field) => {
       this.validate(field, false);
     });
