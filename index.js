@@ -96,6 +96,7 @@ module.exports = class{
   // setValue sets the field value to the masked value passed in. It also calls the changeCallback.
   setValue(fieldName, value, triggerCallback = true) {
     set(this.data, fieldName, this.mask(fieldName, value));
+    set(this.parsedData, fieldName, this.format(fieldName, value).parsed);
     if(triggerCallback) {
       this.changeCallback();
     }
