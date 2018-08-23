@@ -149,6 +149,7 @@ module.exports = function () {
       var triggerCallback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
       set(this.data, fieldName, this.mask(fieldName, value));
+      set(this.parsedData, fieldName, this.format(fieldName, value).parsed);
       if (triggerCallback) {
         this.changeCallback();
       }
