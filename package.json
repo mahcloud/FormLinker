@@ -11,7 +11,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint index.js",
-    "build": "babel index.js --out-dir dist",
+    "build": "babel ./src/index.js --out-file dist/index.js",
     "security": "node_modules/nsp/bin/nsp check",
     "test": "ava"
   },
@@ -25,6 +25,7 @@
     "babel-eslint": "8.2.2",
     "babel-plugin-array-includes": "2.0.3",
     "babel-plugin-transform-es2015-modules-commonjs": "6.26.0",
+    "babel-plugin-transform-object-assign": "6.22.0",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-preset-env": "1.6.1",
     "babel-register": "6.26.0",
