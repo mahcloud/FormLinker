@@ -1,5 +1,5 @@
 import test from "ava";
-import FormLinker from "../";
+import FormLinker from "../src";
 
 test("set value", t => {
   let fl = new FormLinker({

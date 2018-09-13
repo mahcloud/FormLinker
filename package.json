@@ -10,8 +10,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "lint": "eslint index.js",
-    "build": "babel ./src/index.js --out-file dist/index.js",
+    "lint": "eslint src",
+    "build": "babel src --out-dir dist",
     "security": "node_modules/nsp/bin/nsp check",
     "test": "ava"
   },

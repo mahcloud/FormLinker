@@ -1,4 +1,4 @@
-import FormLinker from "../../";
+import FormLinker from "../../src";
 import test from "ava";
 import { NumberFormatter } from "form-formatters";
 

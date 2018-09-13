@@ -1,5 +1,5 @@
 import test from "ava";
-import FormLinker from "../";
+import FormLinker from "../src";
 import { CreditCardFormatter, DateFormatter, NumberFormatter, RequiredFormatter, WholeFormatter } from "form-formatters";
 
 test("validate", t => {
