@@ -213,7 +213,7 @@ module.exports = class{
   // extractDifferences returns an object of every key that has changed with the value it has changed to. This is great for sending only changes.
   extractDifferences(original) {
     let differences = {};
-    const data = this.data;
+    const data = this.parsedData;
 
     this.fields.forEach((field) => {
       if((isNil(get(original, field)) || get(original, field) === "") && (isNil(get(data, field)) || get(data, field) === "")) {
