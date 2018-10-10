@@ -307,7 +307,7 @@ module.exports = function () {
     key: "extractDifferences",
     value: function extractDifferences(original) {
       var differences = {};
-      var data = this.data;
+      var data = this.parsedData;
 
       this.fields.forEach(function (field) {
         if ((isNil(get(original, field)) || get(original, field) === "") && (isNil(get(data, field)) || get(data, field) === "")) {
