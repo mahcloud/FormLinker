@@ -16,8 +16,7 @@
     "test": "ava"
   },
   "dependencies": {
-    "lodash": ">= 4",
-    "yup": ">= 0.25"
+    "lodash": ">= 4"
   },
   "devDependencies": {
     "ava": "0.25.0",
